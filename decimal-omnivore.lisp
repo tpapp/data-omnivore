@@ -18,7 +18,7 @@
              (let+ (((&slots-r/o string message) condition))
                (format stream "Could not parse ~A as a real number: ~A."
                        string message))))
-  (:documentation ""))
+  (:documentation "Error used by parse-rational and parse-real."))
 
 (defun gobble-positive-integer (string start end)
   "If (SUBSEQ STRING START END) starts with a nonnegative integer (ie a sequence of digits 0-9), return the integer and position at which it ends as two values.
@@ -45,7 +45,8 @@ START < END has to hold, END cannot be NIL.  Consequences are undefined when STA
     (#\- (values -1 (1+ start)))
     (t (values 1 start))))
 
-(defparameter +exponent-chars+ "defslDEFSL")
+(defparameter +exponent-chars+ "defslDEFSL"
+  "Default exponent characters.")
 
 (declaim (inline pow10))
 
@@ -64,6 +65,8 @@ fraction ::= digit*
 exponent ::= exponent-char[sign]digit+
 
 with the restriction that WHOLE and FRACTION cannot be empty at the same time.  EXPONENT-CHAR is a string and contains the valid exponent chars.
+
+Whitespace is NOT trimmed, and leads to an error.  In case of a parsing failure, PARSE-RATIONAL-ERROR is used.
 
 Return (values NUMBER DECIMAL-DOT? EXPONENT-CHAR).  NUMBER is a RATIONAL, DECIMAL-DOT? is T when a decimal dot is present, otherwise NIL, EXPONENT-CHAR contains the exponent character, NIL if not present.
 
@@ -145,7 +148,9 @@ Examples:
                                (d-float 'double-float)
                                (l-float 'long-float)
                                (e-float *read-default-float-format*))
-  "Wrapper for PARSE-RATIONAL (see its documentation), converting non-integers to floats.  The float type is determined by the -float arguments for each exponent character.  Integers are not converted to floats."
+  "Wrapper for PARSE-RATIONAL, converting non-integers to floats.  The float type is determined by the -float arguments for each exponent character.  Integers are not converted to floats.  Return a single value, type of (or integer float).
+
+See PARSE-RATIONAL for accepted formats, errors, etc."
   (let+ (((&values real decimal-dot? exponent-char)
           (parse-rational string :start start
                                  :end end
