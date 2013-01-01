@@ -1,7 +1,9 @@
 ;;; -*- Mode:Lisp; Syntax:ANSI-Common-Lisp; Coding:utf-8 -*-
 
 (cl:defpackage #:data-omnivore-tests
-  (:use #:cl #:clunit #:decimal-omnivore #:let-plus))
+  (:use #:cl #:clunit #:decimal-omnivore #:let-plus)
+  (:export
+   #:run))
 
 (in-package #:data-omnivore-tests)
 
