@@ -48,13 +48,6 @@ START < END has to hold, END cannot be NIL.  Consequences are undefined when STA
 (defparameter +exponent-chars+ "defslDEFSL"
   "Default exponent characters.")
 
-(declaim (inline pow10))
-
-(defun pow10 (power)
-  "10 to the given power.  Always exact."
-  (check-type power integer)
-  (expt 10 power))
-
 (defun parse-rational (string &key (start 0) (end nil)
                                    (exponent-chars +exponent-chars+))
   "Parse a decimal rational in (subseq string start end) of the form [sign][whole][.[fraction]][exponent] where
@@ -93,6 +86,9 @@ Examples:
          ((&flet report-error (message)
             (error 'parse-rational-error :string string
                                          :message message)))
+         ((&flet pow10 (power)
+            (check-type power integer)
+            (expt 10 power)))
          ((&flet make-real ()
             (let ((mantissa
                     (* sign
