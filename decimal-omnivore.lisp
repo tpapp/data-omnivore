@@ -17,17 +17,15 @@
   (:report (lambda (condition stream)
              (let+ (((&slots-r/o string message) condition))
                (format stream "Could not parse ~A as a real number: ~A."
-                       string message)))))
+                       string message))))
+  (:documentation ""))
 
 (defun gobble-positive-integer (string start end)
-  "If (SUBSEQ STRING START END) starts with a nonnegative integer (ie a
-sequence of digits 0-9), return the integer and position at which it ends as
-two values.
+  "If (SUBSEQ STRING START END) starts with a nonnegative integer (ie a sequence of digits 0-9), return the integer and position at which it ends as two values.
 
 Otherwise, return NIL and 0.
 
-START < END has to hold, END cannot be NIL.  Consequences are undefined when
-START >= END."
+START < END has to hold, END cannot be NIL.  Consequences are undefined when START >= END."
   (let+ ((result 0)
          ((&flet done (index)
             (return-from gobble-positive-integer
@@ -40,27 +38,12 @@ START >= END."
                   (done index)))
     (done end)))
 
-(defun gobble-integer (string start end)
-  "If (SUBSEQ STRING START END) starts with an integer (ie an optional sign,
-followed by a sequence of digits 0-9), return the integer and position at
-which it ends as two values.
-
-Otherwise, return NIL.
-
-START < END has to hold, END cannot be NIL.  Consequences are undefined when
-START >= END."
-  (let ((first-char (char string start)))
-    (case first-char
-      ((#\+ #\-)
-       (let+ (((&values value end)
-               (gobble-positive-integer string (1+ start) end)))
-         (if value
-             (values (if (char= #\+ first-char)
-                         value
-                         (- value))
-                     end)
-             (error "no digits follow ~A" first-char))))
-      (otherwise (gobble-positive-integer string start end)))))
+(defun gobble-sign (string start)
+  "Return (values SIGNUM INDEX), where SIGNUM is -1 or 1 depending on whether (CHAR STRING START) was a sign, and INDEX is the index of the subsequent character (START or START+1)."
+  (case (char string start)
+    (#\+ (values 1 (1+ start)))
+    (#\- (values -1 (1+ start)))
+    (t (values 1 start))))
 
 (defparameter +exponent-chars+ "defslDEFSL")
 
@@ -73,15 +56,37 @@ START >= END."
 
 (defun parse-rational (string &key (start 0) (end nil)
                                    (exponent-chars +exponent-chars+))
+  "Parse a decimal rational in (subseq string start end) of the form [sign][whole][.[fraction]][exponent] where
+
+sign  ::= + | - | empty
+whole ::= digit*
+fraction ::= digit*
+exponent ::= exponent-char[sign]digit+
+
+with the restriction that WHOLE and FRACTION cannot be empty at the same time.  EXPONENT-CHAR is a string and contains the valid exponent chars.
+
+Return (values NUMBER DECIMAL-DOT? EXPONENT-CHAR).  NUMBER is a RATIONAL, DECIMAL-DOT? is T when a decimal dot is present, otherwise NIL, EXPONENT-CHAR contains the exponent character, NIL if not present.
+
+Numbers of the form .112 and 112. are valid syntax, representing 0.112 and 112.0, respectively.
+
+Examples:
+
+  (parse-rational \"7\")    => (values 7 NIL NIL)
+  (parse-rational \"7.\")   => (values 7 T NIL)
+  (parse-rational \"0.7\")  => (values 7/10 T NIL)
+  (parse-rational \".7\")   => (values 7/10 T NIL)
+  (parse-rational \"7.e2\") => (values 700 T #\e)
+  (parse-rational \".7d1\") => (values 7 T #\d)
+"
   (let+ ((end (or end (length string)))
          ((&macrolet when-end (&body body)
             `(when (= start end)
                ,@body)))
-         (sign 1)
+         sign
          whole
          decimal-dot?
          fraction fraction-digits
-         exponent exponent-char
+         exponent-char exponent-sign exponent
          ((&flet report-error (message)
             (error 'parse-rational-error :string string
                                          :message message)))
@@ -96,21 +101,16 @@ START >= END."
                          (t (report-error "no digits around decimal dot"))))))
               (return-from parse-rational
                 (values (if exponent
-                            (* mantissa (pow10 exponent))
+                            (* mantissa (pow10 (* exponent-sign exponent)))
                             mantissa)
                         decimal-dot?
                         exponent-char))))))
     (assert (< start end))
     ;; sign
-    (let ((maybe-sign (char string start)))
-      (case maybe-sign
-        (#\+ (incf start))
-        (#\- (incf start)
-         (setf sign -1))))
+    (setf (values sign start) (gobble-sign string start))
     (when-end (report-error "sign without digits"))
     ;; whole
     (setf (values whole start) (gobble-positive-integer string start end))
-
     (when-end (make-real))
     ;; fraction
     (when (char= (char string start) #\.)
@@ -130,7 +130,9 @@ START >= END."
         (setf exponent-char maybe-exponent-char)
         (incf start)
         (when-end (report-error "no characters after exponent character"))
-        (setf (values exponent start) (gobble-integer string start end))
+        (setf (values exponent-sign start) (gobble-sign string start))
+        (when-end (report-error "no characters after exponent character or its sign"))
+        (setf (values exponent start) (gobble-positive-integer string start end))
         (unless exponent
           (report-error "missing exponent"))
         (when-end (make-real))))
@@ -143,6 +145,7 @@ START >= END."
                                (d-float 'double-float)
                                (l-float 'long-float)
                                (e-float *read-default-float-format*))
+  "Wrapper for PARSE-RATIONAL (see its documentation), converting non-integers to floats.  The float type is determined by the -float arguments for each exponent character.  Integers are not converted to floats."
   (let+ (((&values real decimal-dot? exponent-char)
           (parse-rational string :start start
                                  :end end
