@@ -106,3 +106,10 @@ STRING represents a number, randomly generated according to the following rules:
 
 (deftest parse-real-test-integer (decimal-omnivore-tests)
   (random-parse-test (random-integer-string 5)))
+
+(deftest parse-rational-errors (decimal-omnivore-tests)
+  (assert-condition parse-rational-error (parse-rational ""))
+  (assert-condition parse-rational-error (parse-rational "junk"))
+  (assert-condition parse-rational-error (parse-rational "1..2"))
+  (assert-condition parse-rational-error (parse-rational "  12  "))
+  (assert-condition parse-rational-error (parse-rational "1.-2")))

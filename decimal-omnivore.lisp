@@ -104,7 +104,8 @@ Examples:
                             mantissa)
                         decimal-dot?
                         exponent-char))))))
-    (assert (< start end))
+    (unless (< start end)
+      (report-error "empty string"))
     ;; sign
     (setf (values sign start) (gobble-sign string start))
     (when-end (report-error "sign without digits"))
