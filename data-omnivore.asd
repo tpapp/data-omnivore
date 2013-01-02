@@ -4,7 +4,10 @@
   :maintainer "Tamas Papp <tkpapp@gmail.com>"
   :author "Tamas Papp <tkpapp@gmail.com>"
   :licence "BOOST"
-  :depends-on (#:alexandria #:anaphora #:let-plus #:cl-csv)
+  :depends-on (#:alexandria
+               #:anaphora
+               #:let-plus
+               #:cl-csv)
   :serial t
   :components ((:file "decimal-omnivore")
                (:file "string-table")
@@ -15,6 +18,7 @@
   :description "Unit tests for DATA-OMNIVORE."
   :maintainer "Tamas Papp <tkpapp@gmail.com>"
   :author "Tamas Papp <tkpapp@gmail.com>"
-  :depends-on (#:data-omnivore #:clunit)
+  :depends-on (#:data-omnivore
+               #:clunit)
   :serial t
   :components ((:file "tests")))
