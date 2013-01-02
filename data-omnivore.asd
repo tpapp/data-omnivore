@@ -11,7 +11,7 @@
   :serial t
   :components ((:file "decimal-omnivore")
                (:file "string-table")
-               (:file "data-omnivore")))
+               (:file "data-column")))
 
 (asdf:defsystem #:data-omnivore-tests
   :version "0"
