@@ -4,8 +4,8 @@
   (:use #:cl
         #:alexandria
         #:clunit
-        #:decimal-omnivore.data-omnivore
-        #:string-table.data-omnivore
+        #:data-omnivore.decimal-omnivore
+        #:data-omnivore.string-table
         #:data-omnivore.data-column
         #:let-plus)
   (:export

@@ -3,8 +3,8 @@
 (cl:defpackage #:data-omnivore.data-column
   (:use #:cl
         #:anaphora
-        #:decimal-omnivore.data-omnivore
-        #:string-table.data-omnivore
+        #:data-omnivore.decimal-omnivore
+        #:data-omnivore.string-table
         #:let-plus)
   (:export
    #:data-column

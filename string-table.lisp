@@ -1,6 +1,6 @@
 ;;; -*- Mode:Lisp; Syntax:ANSI-Common-Lisp; Coding:utf-8 -*-
 
-(cl:defpackage #:string-table.data-omnivore
+(cl:defpackage #:data-omnivore.string-table
   (:use #:cl
         #:alexandria
         #:anaphora
@@ -15,7 +15,7 @@
    #:string-table-add
    #:string-table-intern))
 
-(cl:in-package #:string-table.data-omnivore)
+(cl:in-package #:data-omnivore.string-table)
 
 (defstruct (string-table (:constructor string-table))
   "A table of distinct strings, optionally mapping each one to a value."
