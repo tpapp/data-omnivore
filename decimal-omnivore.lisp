@@ -1,13 +1,13 @@
 ;;; -*- Mode:Lisp; Syntax:ANSI-Common-Lisp; Coding:utf-8 -*-
 
-(cl:defpackage #:decimal-omnivore
+(cl:defpackage #:decimal-omnivore.data-omnivore
   (:use #:cl #:anaphora #:let-plus)
   (:export
    #:parse-rational-error
    #:parse-rational
    #:parse-real))
 
-(in-package #:decimal-omnivore)
+(in-package #:decimal-omnivore.data-omnivore)
 
 ;;; conditions
 

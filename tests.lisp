@@ -1,7 +1,7 @@
 ;;; -*- Mode:Lisp; Syntax:ANSI-Common-Lisp; Coding:utf-8 -*-
 
 (cl:defpackage #:data-omnivore-tests
-  (:use #:cl #:clunit #:decimal-omnivore #:let-plus)
+  (:use #:cl #:clunit #:decimal-omnivore.data-omnivore #:let-plus)
   (:export
    #:run))
 
@@ -108,8 +108,8 @@ STRING represents a number, randomly generated according to the following rules:
   (random-parse-test (random-integer-string 5)))
 
 (deftest parse-rational-errors (decimal-omnivore-tests)
-  (assert-condition parse-rational-error (parse-rational ""))
-  (assert-condition parse-rational-error (parse-rational "junk"))
+  (assert-condition parse-rational-error (parse-rational ""))     ; empty
+  (assert-condition parse-rational-error (parse-rational "junk")) ; junk
   (assert-condition parse-rational-error (parse-rational "1..2"))
   (assert-condition parse-rational-error (parse-rational "  12  "))
   (assert-condition parse-rational-error (parse-rational "1.-2")))
