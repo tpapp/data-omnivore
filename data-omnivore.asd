@@ -7,9 +7,8 @@
   :depends-on (#:alexandria #:anaphora #:let-plus #:cl-csv)
   :serial t
   :components ((:file "decimal-omnivore")
-               (:file "string-table"))
-  ;; :long-description ""
-  )
+               (:file "string-table")
+               (:file "data-omnivore")))
 
 (asdf:defsystem #:data-omnivore-tests
   :version "0"
