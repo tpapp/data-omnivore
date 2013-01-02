@@ -6,9 +6,8 @@
   :licence "BOOST"
   :depends-on (#:alexandria #:anaphora #:let-plus #:cl-csv)
   :serial t
-  ;; components likely need manual reordering
   :components ((:file "decimal-omnivore")
-                )
+               (:file "string-table"))
   ;; :long-description ""
   )
 

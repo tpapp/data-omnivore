@@ -1,7 +1,12 @@
 ;;; -*- Mode:Lisp; Syntax:ANSI-Common-Lisp; Coding:utf-8 -*-
 
 (cl:defpackage #:data-omnivore-tests
-  (:use #:cl #:clunit #:decimal-omnivore.data-omnivore #:let-plus)
+  (:use #:cl
+        #:alexandria
+        #:clunit
+        #:decimal-omnivore.data-omnivore
+        #:string-table.data-omnivore
+        #:let-plus)
   (:export
    #:run))
 
@@ -113,3 +118,39 @@ STRING represents a number, randomly generated according to the following rules:
   (assert-condition parse-rational-error (parse-rational "1..2"))
   (assert-condition parse-rational-error (parse-rational "  12  "))
   (assert-condition parse-rational-error (parse-rational "1.-2")))
+
+
+
+;;; string-table
+
+(defsuite string-table-tests (data-omnivore-tests))
+
+(deftest string-table-basic-test (string-table-tests)
+  (let ((st (string-table)))
+    (assert-equal 0 (string-table-count st))
+    (assert-condition string-table-not-found (string-table-lookup st "foo"))
+    (assert-equal 0 (string-table-count st))
+    (string-table-add st "bar")
+    (assert-equal 1 (string-table-count st))
+    (assert-condition string-table-duplicate (string-table-add st "bar"))))
+
+(deftest string-table-intern-test (string-table-tests)
+  (let+ ((st (string-table))
+         (strings '("foo" "bar" "foo" "baz" "bar"))
+         (interned-strings (mapcar (curry #'string-table-intern st) strings))
+         ((foo1 bar1 foo2 &ign bar2) interned-strings))
+    (assert-eql 3 (string-table-count st))
+    (assert-eq foo1 foo2)
+    (assert-eq bar1 bar2)
+    (assert-equal strings interned-strings)))
+
+(deftest string-table-map-test (string-table-tests)
+  (let+ ((st (string-table))
+         (alist '(("foo" . foo) ("bar" . bar) ("baz" . baz))))
+    (mapc (lambda+ ((string . symbol))
+            (assert-eq symbol (string-table-add st string symbol)))
+          alist)
+    (assert-equal 3 (string-table-count st))
+    (mapc (lambda+ ((string . symbol))
+            (assert-eq symbol (string-table-lookup st string)))
+          alist)))
