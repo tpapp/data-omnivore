@@ -137,7 +137,7 @@ Examples:
           (report-error "missing exponent"))
         (when-end (make-real))))
     (when-end (make-real))
-    (error 'malformed-real :string string :message "trailing junk")))
+    (error 'parse-rational-error :string string :message "trailing junk")))
 
 (defun parse-real (string &key (start 0) (end nil)
                                (s-float 'short-float)
