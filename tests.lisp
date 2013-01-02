@@ -89,7 +89,7 @@ STRING represents a number, randomly generated according to the following rules:
   "Evaluates FORM repeatedly, using the resuling (cons VALUE STRING) to test PARSE-REAL."
   `(loop repeat *iterations*
          do (let+ (((value . string) ,form))
-              (assert-equalp value (parse-real string)
+              (assert-eql value (parse-real string)
                 value string))))
 
 (deftest parse-real-test (decimal-omnivore-tests)
