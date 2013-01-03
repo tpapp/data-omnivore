@@ -71,6 +71,8 @@
     element))
 
 (defun data-column-counts (data-column)
+  "Return the counts."
+  ;; QUESTION may remove this function, data-column-vector should take care of conversions?
   (let+ (((&slots-r/o float-count integer-count map-count string-count)
           data-column))
     (list :float-count float-count
