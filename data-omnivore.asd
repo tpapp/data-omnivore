@@ -6,8 +6,9 @@
   :licence "BOOST"
   :depends-on (#:alexandria
                #:anaphora
-               #:let-plus
-               #:cl-csv)
+               #:cl-csv
+               #:cl-data-frame
+               #:let-plus)
   :serial t
   :components ((:file "decimal-omnivore")
                (:file "string-table")
