@@ -9,8 +9,8 @@
   (:export
    #:data-column
    #:data-column-add
-   #:data-column-elements
-   #:data-column-counts))
+   #:data-column-counts
+   #:data-column-vector))
 
 (in-package #:data-omnivore.data-column)
 
@@ -52,8 +52,10 @@
                                        (string-table-add it string value)))))
 
 (defun data-column-add (data-column string)
-  (let+ (((&slots-r/o reverse-elements default-float-format float-count integer-count
-                      map-count map-table string-count string-table) data-column)
+  (let+ (((&slots-r/o default-float-format float-count
+                      integer-count
+                      map-count map-table
+                      string-count string-table) data-column)
          (element (handler-case (prog1 (string-table-lookup map-table string)
                                   (incf map-count))
                     (string-table-not-found ()
@@ -65,7 +67,7 @@
                         (parse-rational-error ()
                           (prog1 (string-table-intern string-table string string)
                             (incf string-count))))))))
-    (push element reverse-elements)
+    (push element (slot-value data-column 'reverse-elements))
     element))
 
 (defun data-column-counts (data-column)
@@ -76,6 +78,6 @@
           :map-count map-count
           :string-count string-count)))
 
-(defun data-column-elements (data-column)
+(defun data-column-vector (data-column)
   "Return the collected elements as a vector."
   (coerce 'vector (nreverse (slot-value data-column 'reverse-elements))))
