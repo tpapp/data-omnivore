@@ -1,0 +1,71 @@
+;;; -*- Mode:Lisp; Syntax:ANSI-Common-Lisp; Coding:utf-8 -*-
+
+(cl:defpackage #:data-omnivore
+  (:use #:cl
+        #:alexandria
+        #:anaphora
+        #:cl-csv
+        #:cl-data-frame
+        #:let-plus
+        #:data-omnivore.data-column)
+  (:export
+   #:string-to-keyword
+   #:csv-to-data-frame))
+
+(in-package #:data-omnivore)
+
+(defun csv-to-data-columns (stream-or-string skip-first-row?)
+  "Read a CSV file (or stream, or string), accumulate the values in DATA-COLUMNs, return a list of these.  Rows are checked to have the same number of elements.
+
+When SKIP-FIRST-ROW?, the first row is read separately and returned as the second value(list of strings), otherwise it is considered data like all other rows."
+  (cl-csv::with-csv-input-stream (stream stream-or-string)
+    (let+ (data-columns
+           ((&flet read-row ()
+              (aprog1 (read-csv-row stream)
+                (if data-columns
+                    (assert (length= data-columns it))
+                    (setf data-columns
+                          (loop repeat (length it) collect (data-column)))))))
+           (first-row (unless skip-first-row?
+                        (read-row))))
+      (loop named reading-data
+            do (handler-case (mapc #'data-column-add data-columns (read-row))
+                 (end-of-file () (return-from reading-data))))
+      (values data-columns first-row))))
+
+(defun string-to-keyword (string)
+  "Map string to a keyword.
+
+This is the default for constructing column keys for CSV files.
+
+The current implementation replaces #\. and #\space with a #\-, and upcases all other characters."
+  ;; QUESTION: should the result depend on the readtable?
+  (make-keyword (map 'string
+                     (lambda (character)
+                       (case character
+                         ((#\. #\space) #\-)
+                         (otherwise (char-upcase character))))
+                     string)))
+
+(defun csv-to-data-frame (stream-or-string
+                          &key (skip-first-row? nil)
+                               (column-keys-or-function #'string-to-keyword))
+  "Read a CSV file (or stream, or string) into a DATA-FRAME, which is returned.
+
+When SKIP-FIRST-ROW?, the first row is read separately and COLUMN-KEYS-OR-FUNCTION is used to form column keys.
+
+When COLUMN-KEYS-OR-FUNCTION is a sequence, it is used for column keys, regardless of the value of SKIP-FIRST-ROW?."
+  (let+ (((&values data-columns first-row)
+          (csv-to-data-columns stream-or-string skip-first-row?))
+         (column-keys (cond
+                        ((and first-row (functionp column-keys-or-function))
+                         (mapcar column-keys-or-function first-row))
+                        ((typep column-keys-or-function 'sequence)
+                         (assert (length= data-columns column-keys-or-function) ()
+                                 "The length of column keys ~A does not match the number of columns ~A."
+                                 column-keys-or-function (length data-columns)))
+                        (t (error "Could not generate column keys.")))))
+    (apply #'data-frame
+           (mapcan (lambda (column-key data-column)
+                     (list column-key (data-column-vector data-column)))
+                   column-keys data-columns))))
