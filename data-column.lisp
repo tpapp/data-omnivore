@@ -16,16 +16,10 @@
 
 
 
-(defconstant +data-column-min-extension+ 32
-  "")
-
 (defclass data-column ()
-  ((elements
-    :initform (make-array +data-column-min-extension+
-                          :adjustable t
-                          :fill-pointer 0)
-    :type vector
-    :reader data-column-elements)
+  ((reverse-elements
+    :initform nil
+    :type list)
    (default-float-format
     :initarg :default-float-format
     :type symbol)
@@ -58,7 +52,7 @@
                                        (string-table-add it string value)))))
 
 (defun data-column-add (data-column string)
-  (let+ (((&slots-r/o elements default-float-format float-count integer-count
+  (let+ (((&slots-r/o reverse-elements default-float-format float-count integer-count
                       map-count map-table string-count string-table) data-column)
          (element (handler-case (prog1 (string-table-lookup map-table string)
                                   (incf map-count))
@@ -71,7 +65,7 @@
                         (parse-rational-error ()
                           (prog1 (string-table-intern string-table string string)
                             (incf string-count))))))))
-    (vector-push-extend element elements +data-column-min-extension+)
+    (push element reverse-elements)
     element))
 
 (defun data-column-counts (data-column)
@@ -81,3 +75,7 @@
           :integer-count integer-count
           :map-count map-count
           :string-count string-count)))
+
+(defun data-column-elements (data-column)
+  "Return the collected elements as a vector."
+  (coerce 'vector (nreverse (slot-value data-column 'reverse-elements))))
