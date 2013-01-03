@@ -80,4 +80,4 @@
 
 (defun data-column-vector (data-column)
   "Return the collected elements as a vector."
-  (coerce 'vector (nreverse (slot-value data-column 'reverse-elements))))
+  (coerce (nreverse (slot-value data-column 'reverse-elements)) 'vector))
