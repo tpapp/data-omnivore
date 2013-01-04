@@ -17,7 +17,7 @@
 (defun csv-to-data-columns (stream-or-string skip-first-row?)
   "Read a CSV file (or stream, or string), accumulate the values in DATA-COLUMNs, return a list of these.  Rows are checked to have the same number of elements.
 
-When SKIP-FIRST-ROW?, the first row is read separately and returned as the second value(list of strings), otherwise it is considered data like all other rows."
+When SKIP-FIRST-ROW?, the first row is read separately and returned as the second value (list of strings), otherwise it is considered data like all other rows."
   (let (data-columns
         (first-row skip-first-row?))
     (read-csv stream-or-string
