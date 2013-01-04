@@ -175,10 +175,10 @@ STRING represents a number, randomly generated according to the following rules:
     (assert-equalp #("male" "female" "male" "male" "female"
                      112.7d0 99d0 28d0 100d0 0.01d0
                      missing not-available not-available missing missing)
-        (data-column-elements dc))
-    (assert-equalp added-elements (data-column-elements dc))
+        (data-column-vector dc))
+    (assert-equalp added-elements (data-column-vector dc))
     (let+ (((e0 e1 e2 e3 e4 &rest &ign)
-            (coerce (data-column-elements dc) 'list)))
+            (coerce (data-column-vector dc) 'list)))
       (assert-eq e0 e2)
       (assert-eq e0 e3)
       (assert-eq e1 e4))))
