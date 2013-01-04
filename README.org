@@ -4,9 +4,9 @@
 
 This is a library for reading text-based tabular data (such as CSV) into Common Lisp, using the [[https://github.com/tpapp/cl-data-frame][cl-data-frame]] library.
 
-Documentation is currently incomplete, you should look at the unit tests.
+Documentation is currently incomplete, you should look at the unit tests.  A short demonstration:
 
-#+begin_src lisp
+#+BEGIN_SRC lisp
   (asdf:load-systems "data-omnivore" "cl-slice")
 
 
@@ -30,7 +30,7 @@ Documentation is currently incomplete, you should look at the unit tests.
                                 .7f2"))
                   t :all-kinds-of-wacky-number-formats)
       ; => #(0.7d0 19.0d0 70.0)
-#+end_src
+#+END_SRC
 
 ** TODO talk about accepting numbers like =.1= and =1.=, possibility of parsing into R-like factors from string-tables
 
