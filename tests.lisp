@@ -19,8 +19,14 @@
 
 (defsuite data-omnivore-tests ())
 
+(defparameter *iterations* 10000
+  "Number of iterations for random tests.")
+
 (defun run (&optional interactive?)
-  (run-suite 'data-omnivore-tests :use-debugger interactive?))
+  (let ((*iterations* (if interactive?
+                          100
+                          *iterations*)))
+    (run-suite 'data-omnivore-tests :use-debugger interactive?)))
 
 ;;; decimal-omnivore
 
@@ -87,9 +93,6 @@ STRING represents a number, randomly generated according to the following rules:
                                   "0")
                               exponent))))
     (cons value string)))
-
-(defparameter *iterations* 10000
-  "Number of iterations for random tests.")
 
 (defmacro random-parse-test (form)
   "Evaluates FORM repeatedly, using the resuling (cons VALUE STRING) to test PARSE-REAL."
