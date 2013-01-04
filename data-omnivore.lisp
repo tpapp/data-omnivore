@@ -18,20 +18,18 @@
   "Read a CSV file (or stream, or string), accumulate the values in DATA-COLUMNs, return a list of these.  Rows are checked to have the same number of elements.
 
 When SKIP-FIRST-ROW?, the first row is read separately and returned as the second value(list of strings), otherwise it is considered data like all other rows."
-  (cl-csv::with-csv-input-stream (stream stream-or-string)
-    (let+ (data-columns
-           ((&flet read-row ()
-              (aprog1 (read-csv-row stream)
-                (if data-columns
-                    (assert (length= data-columns it))
-                    (setf data-columns
-                          (loop repeat (length it) collect (data-column)))))))
-           (first-row (unless skip-first-row?
-                        (read-row))))
-      (loop named reading-data
-            do (handler-case (mapc #'data-column-add data-columns (read-row))
-                 (end-of-file () (return-from reading-data))))
-      (values data-columns first-row))))
+  (let (data-columns
+        (first-row (not skip-first-row?)))
+    (read-csv stream-or-string
+              :row-fn (lambda (row)
+                        (if data-columns
+                            (assert (length= data-columns row))
+                            (setf data-columns
+                                  (loop repeat (length row) collect (data-column))))
+                        (if first-row
+                            (mapc #'data-column-add data-columns row)
+                            (setf first-row row))))
+    (values data-columns (unless skip-first-row? first-row))))
 
 (defun string-to-keyword (string)
   "Map string to a keyword.
