@@ -4,7 +4,7 @@
 
 This is a library for reading text-based tabular data (such as CSV) into Common Lisp, using the [[https://github.com/tpapp/cl-data-frame][cl-data-frame]] library.
 
-/TODO: talk about accepting numbers like =.1= and =1.=, possibility of parsing into R-like factors from string-tables/
+TODO: talk about accepting numbers like =.1= and =1.=, possibility of parsing into R-like factors from string-tables
 
 * Reporting bugs
 
