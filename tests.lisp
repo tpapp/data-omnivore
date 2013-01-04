@@ -4,9 +4,11 @@
   (:use #:cl
         #:alexandria
         #:clunit
+        #:cl-data-frame
         #:data-omnivore.decimal-omnivore
         #:data-omnivore.string-table
         #:data-omnivore.data-column
+        #:data-omnivore
         #:let-plus)
   (:export
    #:run))
@@ -161,7 +163,7 @@ STRING represents a number, randomly generated according to the following rules:
 
 
 
-;;; data-omnivore
+;;; data-column
 
 (defsuite data-column-tests (data-omnivore-tests))
 
@@ -185,3 +187,21 @@ STRING represents a number, randomly generated according to the following rules:
       (assert-eq e0 e2)
       (assert-eq e0 e3)
       (assert-eq e1 e4))))
+
+
+
+;;; data-omnivore
+
+(defsuite csv-reading-tests (data-omnivore-tests))
+
+(deftest csv-readinb-basic (csv-reading-tests)
+  (let ((df (csv-to-data-frame
+             "Index,Gender,Age
+0,\"Male\",30
+1,\"Female\",31
+2,Male,\"32\"
+")))
+    (assert-equalp '(:index #(0 1 2)
+                     :gender #("Male" "Female" "Male")
+                     :age #(30 31 32))
+        (data-frame-plist df))))
