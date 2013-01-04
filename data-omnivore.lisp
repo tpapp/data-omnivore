@@ -20,15 +20,13 @@
 When SKIP-FIRST-ROW?, the first row is read separately and returned as the second value (list of strings), otherwise it is considered data like all other rows."
   (let (data-columns
         (first-row skip-first-row?))
-    (read-csv stream-or-string
-              :row-fn (lambda (row)
-                        (if data-columns
-                            (assert (length= data-columns row))
-                            (setf data-columns
-                                  (loop repeat (length row) collect (data-column))))
-                        (if first-row
-                            (mapc #'data-column-add data-columns row)
-                            (setf first-row row))))
+    (do-csv (row stream-or-string)
+      (if data-columns
+          (assert (length= data-columns row))
+          (setf data-columns (loop repeat (length row) collect (data-column))))
+      (if first-row
+          (mapc #'data-column-add data-columns row)
+          (setf first-row row)))
     (values data-columns (unless skip-first-row? first-row))))
 
 (defun string-to-keyword (string)
