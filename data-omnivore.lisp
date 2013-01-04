@@ -19,7 +19,7 @@
 
 When SKIP-FIRST-ROW?, the first row is read separately and returned as the second value(list of strings), otherwise it is considered data like all other rows."
   (let (data-columns
-        (first-row (not skip-first-row?)))
+        (first-row skip-first-row?))
     (read-csv stream-or-string
               :row-fn (lambda (row)
                         (if data-columns
