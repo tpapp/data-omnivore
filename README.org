@@ -1,0 +1,11 @@
+| This library is experimental.  Your comments are very welcome. |
+
+* Reading text-based tabular data into Common Lisp
+
+This is a library for reading text-based tabular data (such as CSV) into Common Lisp, using the [[https://github.com/tpapp/cl-data-frame][cl-data-frame]] library.
+
+/TODO: talk about accepting numbers like =.1= and =1.=, possibility of parsing into R-like factors from string-tables/
+
+* Reporting bugs
+
+Please report bugs using the [[https://github.com/tpapp/data-omnivore/issues][issue tracker]].
