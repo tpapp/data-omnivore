@@ -9,7 +9,6 @@ Documentation is currently incomplete, you should look at the unit tests.  A sho
 #+BEGIN_SRC lisp
   (asdf:load-systems "data-omnivore" "cl-slice")
 
-
   (defparameter *d* (data-omnivore:csv-to-data-frame
                      (format nil "Gender,Age,Height~@
                                   \"Male\",30,180.~@
@@ -27,9 +26,12 @@ Documentation is currently incomplete, you should look at the unit tests.  A sho
                    (format nil "\"All kinds of wacky number formats\"~%.7~%19.~%.7f2"))
                   t :all-kinds-of-wacky-number-formats)
       ; => #(0.7d0 19.0d0 70.0)
+
 #+END_SRC
 
-** TODO talk about accepting numbers like =.1= and =1.=, possibility of parsing into R-like factors from string-tables
+** TODO more documentation
+
+talk about accepting numbers like =.1= and =1.=, possibility of parsing into R-like factors from string-tables
 
 * Reporting bugs
 
