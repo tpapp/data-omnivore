@@ -4,7 +4,35 @@
 
 This is a library for reading text-based tabular data (such as CSV) into Common Lisp, using the [[https://github.com/tpapp/cl-data-frame][cl-data-frame]] library.
 
-TODO: talk about accepting numbers like =.1= and =1.=, possibility of parsing into R-like factors from string-tables
+Documentation is currently incomplete, you should look at the unit tests.
+
+#+begin_src lisp
+  (asdf:load-systems "data-omnivore" "cl-slice")
+
+
+  (defparameter *d* (data-omnivore:csv-to-data-frame
+                     (format nil "Gender,Age,Height~@
+                                  \"Male\",30,180.~@
+                                  \"Male\",31,182.7~@
+                                  \"Female\",32,1.65e2")))
+
+  (cl-slice:slice *d* t :gender)
+      ; => #("Male" "Male" "Female")
+
+  (let ((strings (cl-slice:slice *d* t :gender)))
+    (eq (aref strings 0) (aref strings 1)))
+      ; => T, strings in the same column are interned once
+
+  (cl-slice:slice (data-omnivore:csv-to-data-frame
+                   (format nil "\"All kinds of wacky number formats\"~@
+                                .7~@
+                                19.
+                                .7f2"))
+                  t :all-kinds-of-wacky-number-formats)
+      ; => #(0.7d0 19.0d0 70.0)
+#+end_src
+
+** TODO talk about accepting numbers like =.1= and =1.=, possibility of parsing into R-like factors from string-tables
 
 * Reporting bugs
 
