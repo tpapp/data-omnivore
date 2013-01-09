@@ -4,7 +4,6 @@
   (:use #:cl
         #:alexandria
         #:clunit
-        #:cl-data-frame
         #:data-omnivore.decimal-omnivore
         #:data-omnivore.string-table
         #:data-omnivore.data-column
