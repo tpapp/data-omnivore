@@ -204,4 +204,4 @@ STRING represents a number, randomly generated according to the following rules:
     (assert-equalp '(:index #(0 1 2)
                      :gender #("Male" "Female" "Male")
                      :age #(30 31 32))
-        (data-frame-plist df))))
+        (data-frame:as-plist df))))

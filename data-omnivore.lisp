@@ -5,7 +5,6 @@
         #:alexandria
         #:anaphora
         #:cl-csv
-        #:cl-data-frame
         #:let-plus
         #:data-omnivore.data-column)
   (:export
@@ -61,7 +60,7 @@ When COLUMN-KEYS-OR-FUNCTION is a sequence, it is used for column keys, regardle
                                  "The length of column keys ~A does not match the number of columns ~A."
                                  column-keys-or-function (length data-columns)))
                         (t (error "Could not generate column keys.")))))
-    (apply #'data-frame
-           (mapcan (lambda (column-key data-column)
-                     (list column-key (data-column-vector data-column)))
-                   column-keys data-columns))))
+    (data-frame:alist-df
+     (mapcar (lambda (column-key data-column)
+               (cons column-key (data-column-vector data-column)))
+             column-keys data-columns))))
