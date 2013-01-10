@@ -29,6 +29,12 @@
    (integer-count
     :initform 0
     :type non-negative-integer)
+   (integer-min
+    :initform nil
+    :type integer)
+   (integer-max
+    :initform nil
+    :type integer)
    (map-count
     :initform 0
     :type non-negative-integer)
@@ -52,17 +58,24 @@
                                        (string-table-add it string value)))))
 
 (defun data-column-add (data-column string)
-  (let+ (((&slots-r/o default-float-format float-count
-                      integer-count
-                      map-count map-table
-                      string-count string-table) data-column)
+  (let+ (((&slots-r/o default-float-format map-table string-table) data-column)
+         ((&slots float-count integer-count integer-min integer-max
+                  map-count string-count) data-column)
          (element (handler-case (prog1 (string-table-lookup map-table string)
                                   (incf map-count))
                     (string-table-not-found ()
                       (handler-case (aprog1 (parse-real string
                                                         :e-float default-float-format)
                                       (if (integerp it)
-                                          (incf integer-count)
+                                          (progn  (incf integer-count)
+                                                  (if integer-min
+                                                      (progn
+                                                        (alexandria:maxf
+                                                         integer-min it)
+                                                        (alexandria:maxf
+                                                         integer-max it))
+                                                      (setf integer-min it
+                                                            integer-max it)))
                                           (incf float-count)))
                         (parse-rational-error ()
                           (prog1 (string-table-intern string-table string string)
@@ -82,4 +95,16 @@
 
 (defun data-column-vector (data-column)
   "Return the collected elements as a vector."
-  (coerce (reverse (slot-value data-column 'reverse-elements)) 'vector))
+  (let+ (((&slots-r/o float-count integer-count integer-min integer-max
+                      map-count string-count)
+          data-column)
+         (element-type
+          (cond
+            ((and (= 0 float-count map-count string-count)
+                  (plusp integer-count))
+             (cond
+               ((<= 0 integer-min integer-max 1) 'bit)
+               (t t)))
+            (t t))))
+    (coerce (reverse (slot-value data-column 'reverse-elements))
+            `(simple-array ,element-type (*)))))
